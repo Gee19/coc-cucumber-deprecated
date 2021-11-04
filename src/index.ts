@@ -1,12 +1,97 @@
-import { commands, CompleteResult, ExtensionContext, listManager, sources, window, workspace } from 'coc.nvim';
+import {
+  commands,
+  CompleteResult,
+  Disposable,
+  DocumentSelector,
+  ExtensionContext,
+  languages,
+  listManager,
+  sources,
+  TextEdit,
+  TextDocument,
+  Range,
+  window,
+  workspace,
+} from 'coc.nvim';
+import CucumberFormattingEditProvider from './format';
+import { scanForStepFeatures } from './formatter/feature';
 import DemoList from './lists';
+
+interface Selectors {
+  rangeLanguageSelector: DocumentSelector;
+  languageSelector: DocumentSelector;
+}
+
+let formatterHandler: undefined | Disposable;
+let rangeFormatterHandler: undefined | Disposable;
+
+function disposeHandlers(): void {
+  if (formatterHandler) {
+    formatterHandler.dispose();
+  }
+  if (rangeFormatterHandler) {
+    rangeFormatterHandler.dispose();
+  }
+  formatterHandler = undefined;
+  rangeFormatterHandler = undefined;
+}
+
+function selectors(): Selectors {
+  const languageSelector = [{ language: 'cucumber', scheme: 'file' }];
+  const rangeLanguageSelector = [{ language: 'cucumber', scheme: 'file' }];
+
+  return {
+    languageSelector,
+    rangeLanguageSelector,
+  };
+}
+
+export function fullDocumentRange(document: TextDocument): Range {
+  const lastLineId = document.lineCount - 1;
+  const doc = workspace.getDocument(document.uri);
+
+  return Range.create({ character: 0, line: 0 }, { character: doc.getline(lastLineId).length, line: lastLineId });
+}
 
 export async function activate(context: ExtensionContext): Promise<void> {
   window.showMessage(`coc-cucumber works!`);
+  const extensionConfig = workspace.getConfiguration('cucumber');
+  const outputChannel = window.createOutputChannel('cucumber');
+  outputChannel.appendLine(`${'#'.repeat(10)} cucumber\n`);
 
+  // Formatter
+  let cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
+  cukePath = scanForStepFeatures(context, cukePath);
+  if (!cukePath) {
+    window.showErrorMessage('Unable to find any step definitions or feature files.');
+  }
+
+  const editProvider = new CucumberFormattingEditProvider(context, outputChannel);
+  const priority = 1;
+
+  function registerFormatter(): void {
+    disposeHandlers();
+    const { languageSelector, rangeLanguageSelector } = selectors();
+
+    rangeFormatterHandler = languages.registerDocumentRangeFormatProvider(
+      rangeLanguageSelector,
+      editProvider,
+      priority
+    );
+    formatterHandler = languages.registerDocumentFormatProvider(languageSelector, editProvider, priority);
+  }
+  registerFormatter();
+
+  // Commands/Keymaps/Autocomplete
   context.subscriptions.push(
-    commands.registerCommand('coc-cucumber.Command', async () => {
-      window.showMessage(`coc-cucumber Commands works!`);
+    commands.registerCommand('cucumber.Format', async () => {
+      const doc = await workspace.document;
+      const doFormat = editProvider.getFormatFunc();
+      const code = await doFormat(context, outputChannel, doc.textDocument, undefined);
+      const edits = [TextEdit.replace(fullDocumentRange(doc.textDocument), code)];
+      if (edits) {
+        await doc.applyEdits(edits);
+      }
     }),
 
     listManager.registerList(new DemoList(workspace.nvim)),
@@ -31,8 +116,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
     workspace.registerAutocmd({
       event: 'InsertLeave',
       request: true,
-      callback: () => {
-        window.showMessage(`registerAutocmd on InsertLeave`);
+      callback: async () => {
+        const doc = await workspace.document;
+        const doFormat = editProvider.getFormatFunc();
+        const code = await doFormat(context, outputChannel, doc.textDocument, undefined);
+        const edits = [TextEdit.replace(fullDocumentRange(doc.textDocument), code)];
+        if (edits) {
+          await doc.applyEdits(edits);
+        }
       },
     })
   );

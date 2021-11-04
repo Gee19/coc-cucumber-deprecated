@@ -49,12 +49,12 @@
       "type": "object",
       "title": "coc-cucumber configuration",
       "properties": {
-        "coc-cucumber.enabled": {
+        "cucumber.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable coc-cucumber extension"
         },
-        "cucumberautocomplete.steps": {
+        "cucumber.autocomplete.steps": {
           "description": "Path or array of glob-style-pathes to the steps files",
           "type": [
             "array",
@@ -62,12 +62,12 @@
           ],
           "required": false
         },
-        "cucumberautocomplete.pages": {
+        "cucumber.autocomplete.pages": {
           "description": "Object, which consists of 'page name' => 'page object file path' pairs",
           "type": "object",
           "required": false
         },
-        "cucumberautocomplete.syncfeatures": {
+        "cucumber.autocomplete.syncfeatures": {
           "description": "Will get steps using count from glob-style path or from '**/*.feature' if true",
           "type": [
             "boolean",
@@ -76,61 +76,61 @@
           "required": false,
           "default": "test/features/*.feature"
         },
-        "cucumberautocomplete.strictGherkinCompletion": {
+        "cucumber.autocomplete.strictGherkinCompletion": {
           "description": "Strict comparing of declaration func and gherkin word (ex. show only steps, declared via 'When()' func for the 'When ' string",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.strictGherkinValidation": {
+        "cucumber.autocomplete.strictGherkinValidation": {
           "description": "Compare step body and gherkin word during steps validation",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.smartSnippets": {
+        "cucumber.autocomplete.smartSnippets": {
           "description": "Change all the parts, that requires some user input (like .*, ([a-z]+), \\w{1,3}) to snippets",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.stepsInvariants": {
+        "cucumber.autocomplete.stepsInvariants": {
           "description": "Show all the 'or' steps parts as separate suggestions (ex. show `I use a` and `I use b` steps suggestions for the `I use (a|b)` step",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.customParameters": {
+        "cucumber.autocomplete.customParameters": {
           "description": "Change some steps RegEx parts depending on array of 'parameter' - 'value' key pairs. Parameter could be string or RegEx object",
           "type": "array",
           "required": false,
           "default": []
         },
-        "cucumberautocomplete.skipDocStringsFormat": {
+        "cucumber.autocomplete.skipDocStringsFormat": {
           "description": "Skip format of strings, that placed between ''' or \"\"\" strings",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.formatConfOverride": {
+        "cucumber.autocomplete.formatConfOverride": {
           "description": "Override some formatting via format conf strings = {[key: String]: num | 'relative'}, where key - beggining of the string, num - numeric value of indents",
           "type": "object",
           "required": false,
           "default": {}
         },
-        "cucumberautocomplete.onTypeFormat": {
+        "cucumber.autocomplete.onTypeFormat": {
           "description": "Enable ontype formattings (activating after pressing on space, @ and : keys)",
           "type": "boolean",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.gherkinDefinitionPart": {
+        "cucumber.autocomplete.gherkinDefinitionPart": {
           "description": "Provide step definition name part of regex(ex. '@(given|when|then|step)\\(' in case of python-like steps. Please ensure, that they are placed in regex match '()' braces",
           "type": "string",
           "required": false,
           "default": false
         },
-        "cucumberautocomplete.stepRegExSymbol": {
+        "cucumber.autocomplete.stepRegExSymbol": {
           "descrioption": "Provide step regex symbol. Ex. it would be \"'\" for When('I do something') definition",
           "type": "string",
           "required": false,
@@ -141,8 +141,8 @@
   },
   "commands": [
     {
-      "command": "coc-cucumber.Command",
-      "title": "coc-cucumber command title"
+      "command": "cucumber.Format",
+      "title": "coc-cucumber format command"
     }
   ]
 }
