@@ -13,33 +13,21 @@ interface Block {
   data: string[];
 }
 
-export function scanForStepFeatures(context: ExtensionContext, cukePath: string): string {
-  if (!cukePath) {
-    // check the regular spots
-    // *.feature, *.js, *.ts to start
-    // cypress/integration/
-    // steps/
-    return 'gg';
-  }
-
-  return cukePath;
-}
-
-export async function formatTables(
+export function debuggin(
   context: ExtensionContext,
   outputChannel: OutputChannel,
   document: TextDocument,
   range?: Range
-): Promise<string> {
+): string {
+  // check the regular spots
+  // *.feature, *.js, *.ts to start
+  // cypress/integration/
+  // steps/
   const extensionConfig = workspace.getConfiguration('cucumber');
   const fileName = Uri.parse(document.uri).fsPath;
   const text = document.getText(range);
 
-  let blockNum = 0;
-  let textArr = text.split(/\r?\n/g);
-
-  let cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
-  cukePath = scanForStepFeatures(context, cukePath);
+  const cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
   if (!cukePath) {
     window.showErrorMessage('Unable to find any step definitions or feature files.');
     return text;
@@ -52,6 +40,19 @@ export async function formatTables(
   outputChannel.appendLine(`Cwd: ${opts.cwd}`);
   outputChannel.appendLine(`File: ${fileName}`);
   outputChannel.appendLine(`Cukes: ${cukePath}`);
+  return cukePath;
+}
+
+export async function formatTables(
+  context: ExtensionContext,
+  outputChannel: OutputChannel,
+  document: TextDocument,
+  range?: Range
+): Promise<string> {
+  const text = document.getText(range);
+
+  let blockNum = 0;
+  let textArr = text.split(/\r?\n/g);
 
   //Get blocks with data in cucumber tables
   const blocks: Block[] = textArr.reduce((res, l, i, arr) => {

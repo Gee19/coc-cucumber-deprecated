@@ -14,7 +14,6 @@ import {
   workspace,
 } from 'coc.nvim';
 import CucumberFormattingEditProvider from './format';
-import { scanForStepFeatures } from './formatter/feature';
 import DemoList from './lists';
 
 interface Selectors {
@@ -60,8 +59,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   outputChannel.appendLine(`${'#'.repeat(10)} cucumber\n`);
 
   // Formatter
-  let cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
-  cukePath = scanForStepFeatures(context, cukePath);
+  const cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
   if (!cukePath) {
     window.showErrorMessage('Unable to find any step definitions or feature files.');
   }
@@ -81,6 +79,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     formatterHandler = languages.registerDocumentFormatProvider(languageSelector, editProvider, priority);
   }
   registerFormatter();
+  // languages.registerDefinitionProvider(selector, provider);
 
   // Commands/Keymaps/Autocomplete
   context.subscriptions.push(
