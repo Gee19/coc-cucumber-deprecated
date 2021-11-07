@@ -7,13 +7,13 @@ Testing with [cypress-cucumber-example](https://github.com/Gee19/cypress-cucumbe
 ## Progress/Plan
 
 - [ ] Configuration
-- [ ] Document format support
+- [x] Document format support
   - [x] Tables
     - [x] Manual format command
     - [x] Format on Save/InsertLeave
-  - [ ] Indent
-    - [ ] Manual format command
-    - [ ] Format on Save/InsertLeave
+  - [x] Indent
+    - [x] Manual format command
+    - [x] Format on Save/InsertLeave
 - [ ] Auto-parse feature steps from paths, provided in CocLocalConfig otherwise
 - [ ] Autocompletion of steps
 - [ ] Go-to definition

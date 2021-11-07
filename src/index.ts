@@ -93,24 +93,24 @@ export async function activate(context: ExtensionContext): Promise<void> {
       }
     }),
 
-    listManager.registerList(new DemoList(workspace.nvim)),
+    // listManager.registerList(new DemoList(workspace.nvim)),
 
-    sources.createSource({
-      name: 'coc-cucumber completion source', // unique id
-      doComplete: async () => {
-        const items = await getCompletionItems();
-        return items;
-      },
-    }),
+    // sources.createSource({
+    //   name: 'coc-cucumber completion source', // unique id
+    //   doComplete: async () => {
+    //     const items = await getCompletionItems();
+    //     return items;
+    //   },
+    // }),
 
-    workspace.registerKeymap(
-      ['n'],
-      'cucumber-keymap',
-      async () => {
-        window.showMessage(`registerKeymap`);
-      },
-      { sync: false }
-    ),
+    // workspace.registerKeymap(
+    //   ['n'],
+    //   'cucumber-keymap',
+    //   async () => {
+    //     window.showMessage(`registerKeymap`);
+    //   },
+    //   { sync: false }
+    // ),
 
     workspace.registerAutocmd({
       event: 'InsertLeave',
@@ -128,17 +128,17 @@ export async function activate(context: ExtensionContext): Promise<void> {
   );
 }
 
-async function getCompletionItems(): Promise<CompleteResult> {
-  return {
-    items: [
-      {
-        word: 'TestCompletionItem 1',
-        menu: '[coc-cucumber]',
-      },
-      {
-        word: 'TestCompletionItem 2',
-        menu: '[coc-cucumber]',
-      },
-    ],
-  };
-}
+// async function getCompletionItems(): Promise<CompleteResult> {
+//   return {
+//     items: [
+//       {
+//         word: 'TestCompletionItem 1',
+//         menu: '[coc-cucumber]',
+//       },
+//       {
+//         word: 'TestCompletionItem 2',
+//         menu: '[coc-cucumber]',
+//       },
+//     ],
+//   };
+// }

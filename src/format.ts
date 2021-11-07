@@ -8,7 +8,7 @@ import {
   workspace,
 } from 'coc.nvim';
 
-import { formatTables } from './formatter/feature';
+import { format } from './formatter/feature';
 
 export type FormatFuncType = (
   context: ExtensionContext,
@@ -44,7 +44,7 @@ class CucumberFormattingEditProvider implements DocumentFormattingEditProvider {
   public getFormatFunc(): FormatFuncType {
     // JSON? Indent?
     // Stick to tables for now
-    return formatTables;
+    return format;
   }
 
   private async _provideEdits(document: TextDocument, range?: Range): Promise<TextEdit[]> {
