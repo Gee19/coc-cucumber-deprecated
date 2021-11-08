@@ -10,10 +10,15 @@ import {
   TextEdit,
   TextDocument,
   Range,
+  Position,
   window,
   workspace,
+  CancellationToken,
+  CompletionContext,
+  CompletionItem,
 } from 'coc.nvim';
 import CucumberFormattingEditProvider from './format';
+import StepsHandler from './step.handler';
 import DemoList from './lists';
 
 interface Selectors {
@@ -23,6 +28,8 @@ interface Selectors {
 
 let formatterHandler: undefined | Disposable;
 let rangeFormatterHandler: undefined | Disposable;
+
+let stepsHandler: StepsHandler;
 
 function disposeHandlers(): void {
   if (formatterHandler) {
@@ -59,7 +66,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   outputChannel.appendLine(`${'#'.repeat(10)} cucumber\n`);
 
   // Formatter
-  const cukePath = extensionConfig.get('cucumber.autocomplete.steps', '');
+  const cukePath = extensionConfig.get('cucumber.autocomplete.steps', []);
   if (!cukePath) {
     window.showErrorMessage('Unable to find any step definitions or feature files.');
   }
@@ -79,7 +86,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     formatterHandler = languages.registerDocumentFormatProvider(languageSelector, editProvider, priority);
   }
   registerFormatter();
+
   // languages.registerDefinitionProvider(selector, provider);
+  // languages.registerCompletionItemProvider(stepsHandler);
 
   // Commands/Keymaps/Autocomplete
   context.subscriptions.push(
@@ -95,13 +104,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     // listManager.registerList(new DemoList(workspace.nvim)),
 
-    // sources.createSource({
-    //   name: 'coc-cucumber completion source', // unique id
-    //   doComplete: async () => {
-    //     const items = await getCompletionItems();
-    //     return items;
-    //   },
-    // }),
+    sources.createSource({
+      name: 'coc-cucumber completion source', // unique id
+      doComplete: async () => {
+        const doc = await workspace.document;
+        const state = await workspace.getCurrentState();
+        const items = await getCompletionItems(doc.textDocument, state.position);
+        return items;
+      },
+    }),
 
     // workspace.registerKeymap(
     //   ['n'],
@@ -128,17 +139,24 @@ export async function activate(context: ExtensionContext): Promise<void> {
   );
 }
 
-// async function getCompletionItems(): Promise<CompleteResult> {
-//   return {
-//     items: [
-//       {
-//         word: 'TestCompletionItem 1',
-//         menu: '[coc-cucumber]',
-//       },
-//       {
-//         word: 'TestCompletionItem 2',
-//         menu: '[coc-cucumber]',
-//       },
-//     ],
-//   };
-// }
+function handleSteps(): boolean {
+  const extensionConfig = workspace.getConfiguration('cucumber');
+  const s = extensionConfig.get('cucumber.autocomplete.steps', []);
+  return s && s.length ? true : false;
+}
+
+async function getCompletionItems(document: TextDocument, position: Position): Promise<CompletionItem[] | null> {
+  const text = document.getText({
+    start: { line: position.line, character: 0 },
+    end: position,
+  });
+  const line = text.split(/\r?\n/g)[position.line];
+  // const char = position.character;
+  // if (pagesPosition(line, char) && pagesHandler) {
+  //   return pagesHandler.getCompletion(line, position.position);
+  // }
+  if (handleSteps() && stepsHandler) {
+    return stepsHandler.getCompletion(line, position.line, text);
+  }
+  return null;
+}

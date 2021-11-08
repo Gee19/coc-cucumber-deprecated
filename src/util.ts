@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as strip from 'strip-comments';
-import { Range } from 'vscode-languageserver';
+import { Range } from 'coc.nvim';
 import * as md5 from 'md5';
 
 export function getOSPath(path: string): string {
@@ -79,4 +79,3 @@ export function getSortPrefix(num: number, count: number): string {
   }
   return res;
 }
-
