@@ -2,7 +2,9 @@
 
 WIP Port of [VSCucumberAutoComplete](https://github.com/alexkrechik/VSCucumberAutoComplete) for coc.nvim
 
-Testing with [cypress-cucumber-example](https://github.com/Gee19/cypress-cucumber-example)
+Testing with:
+- [cypress-cucumber-example](https://github.com/Gee19/cypress-cucumber-example)
+- [coffee-machine-javascript](https://github.com/cucumber/coffee-machine-javascript)
 
 ## Progress/Plan
 
@@ -10,10 +12,10 @@ Testing with [cypress-cucumber-example](https://github.com/Gee19/cypress-cucumbe
 - [x] Document format support
   - [x] Tables
     - [x] Manual format command
-    - [x] Format on Save/InsertLeave
+    - [x] Format on Save
   - [x] Indent
     - [x] Manual format command
-    - [x] Format on Save/InsertLeave
+    - [x] Format on Save
 - [x] Snippets
 - [ ] Auto-parse feature steps from paths, provided in CocLocalConfig otherwise
 - [ ] Autocompletion of steps

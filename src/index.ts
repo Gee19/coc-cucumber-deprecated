@@ -91,7 +91,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
       if (edits) {
         await doc.applyEdits(edits);
       }
-    }),
+    })
 
     // listManager.registerList(new DemoList(workspace.nvim)),
 
@@ -112,19 +112,19 @@ export async function activate(context: ExtensionContext): Promise<void> {
     //   { sync: false }
     // ),
 
-    workspace.registerAutocmd({
-      event: 'InsertLeave',
-      request: true,
-      callback: async () => {
-        const doc = await workspace.document;
-        const doFormat = editProvider.getFormatFunc();
-        const code = await doFormat(context, outputChannel, doc.textDocument, undefined);
-        const edits = [TextEdit.replace(fullDocumentRange(doc.textDocument), code)];
-        if (edits) {
-          await doc.applyEdits(edits);
-        }
-      },
-    })
+    // workspace.registerAutocmd({
+    //   event: 'InsertLeave',
+    //   request: true,
+    //   callback: async () => {
+    //     const doc = await workspace.document;
+    //     const doFormat = editProvider.getFormatFunc();
+    //     const code = await doFormat(context, outputChannel, doc.textDocument, undefined);
+    //     const edits = [TextEdit.replace(fullDocumentRange(doc.textDocument), code)];
+    //     if (edits) {
+    //       await doc.applyEdits(edits);
+    //     }
+    //   },
+    // })
   );
 }
 
