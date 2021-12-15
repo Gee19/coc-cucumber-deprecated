@@ -14,13 +14,13 @@ Testing with [cypress-cucumber-example](https://github.com/Gee19/cypress-cucumbe
   - [x] Indent
     - [x] Manual format command
     - [x] Format on Save/InsertLeave
+- [x] Snippets
 - [ ] Auto-parse feature steps from paths, provided in CocLocalConfig otherwise
 - [ ] Autocompletion of steps
 - [ ] Go-to definition
 
 TBD:
 - [ ] Syntax highlighting
-- [ ] Snippets
 - [ ] Step validation
 
 ## Install
