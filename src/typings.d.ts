@@ -10,7 +10,7 @@ type CustomParameter = {
 };
 
 type FormatConf = {
-  [key: string]: number | 'relative';
+  [key: string]: number | "relative";
 };
 
 interface Settings {
@@ -30,4 +30,3 @@ interface Settings {
     stepRegExSymbol?: string;
   };
 }
-

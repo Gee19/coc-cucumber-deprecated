@@ -12,7 +12,8 @@ import {
   Range,
   CompletionItemKind,
   InsertTextFormat,
-} from 'vscode-languageserver';
+  workspace,
+} from 'coc.nvim';
 
 import * as glob from 'glob';
 
@@ -36,10 +37,10 @@ interface JSDocComments {
   [key: number]: string;
 }
 
-const commentParser = require('doctrine');
+import commentParser from 'doctrine';
 
 export default class StepsHandler {
-  elements: Step[];
+  elements: Step[] | undefined;
 
   elementsHash: { [step: string]: boolean } = {};
 
@@ -48,13 +49,15 @@ export default class StepsHandler {
   settings: Settings;
 
   constructor(root: string, settings: Settings) {
-    const { steps, syncfeatures } = settings.cucumberautocomplete;
+    const extensionConfig = workspace.getConfiguration('cucumber');
+    const steps = extensionConfig.get('cucumber.autocomplete.steps', []);
+    const features = extensionConfig.get('cucumber.autocomplete.steps', []);
     this.settings = settings;
     this.populate(root, steps);
-    if (syncfeatures === true) {
+    if (features) {
       this.setElementsHash(`${root}/**/*.feature`);
-    } else if (typeof syncfeatures === 'string') {
-      this.setElementsHash(`${root}/${syncfeatures}`);
+    } else if (typeof features === 'string') {
+      this.setElementsHash(`${root}/${features}`);
     }
   }
 
@@ -62,7 +65,7 @@ export default class StepsHandler {
     return new RegExp(`^(\\s*)(${allGherkinWords})(\\s+)(.*)`);
   }
 
-  getElements(): Step[] {
+  getElements(): Step[] | undefined {
     return this.elements;
   }
 
@@ -97,19 +100,21 @@ export default class StepsHandler {
   }
 
   getStepRegExp(): RegExp {
+    const extensionConfig = workspace.getConfiguration('cucumber');
+    const gherkinDefinitionPart = extensionConfig.get('cucumber.autocomplete.gherkinDefinitionPart', []);
     //Actually, we dont care what the symbols are before our 'Gherkin' word
     //But they shouldn't end with letter
     const startPart = '^((?:[^\'"/]*?[^\\w])|.{0})';
 
     //All the steps should be declared using any gherkin keyword. We should get first 'gherkin' word
-    const gherkinPart =
-      this.settings.cucumberautocomplete.gherkinDefinitionPart || `(${allGherkinWords}|defineStep|Step|StepDefinition)`;
+    const gherkinPart = gherkinDefinitionPart || `(${allGherkinWords}|defineStep|Step|StepDefinition)`;
 
     //All the symbols, except of symbols, using as step start and letters, could be between gherkin word and our step
     const nonStepStartSymbols = `[^\/'"\`\\w]*?`;
 
     // Step part getting
-    const { stepRegExSymbol } = this.settings.cucumberautocomplete;
+    const stepRegExSymbol = extensionConfig.get('cucumber.autocomplete.stepRegExSymbol', '');
+
     //Step text could be placed between '/' symbols (ex. in JS) or between quotes, like in Java
     const stepStart = stepRegExSymbol ? `(${stepRegExSymbol})` : `(\/|'|"|\`)`;
     //Our step could contain any symbols, except of our 'stepStart'. Use \3 to be sure in this
@@ -124,7 +129,7 @@ export default class StepsHandler {
     return r;
   }
 
-  geStepDefinitionMatch(line: string): RegExpMatchArray {
+  geStepDefinitionMatch(line: string): RegExpMatchArray | null {
     return line.match(this.getStepRegExp());
   }
 
@@ -143,7 +148,7 @@ export default class StepsHandler {
     }, {});
   }
 
-  getGherkinMatch(line: string, document: string): RegExpMatchArray {
+  getGherkinMatch(line: string, document: string): RegExpMatchArray | null {
     const outlineMatch = line.match(/<.*?>/g);
     if (outlineMatch) {
       const outlineVars = this.getOutlineVars(document);
@@ -177,7 +182,9 @@ export default class StepsHandler {
 
   handleCustomParameters(step: string): string {
     if (!step) return '';
-    this.settings.cucumberautocomplete.customParameters.forEach((p: CustomParameter) => {
+    const extensionConfig = workspace.getConfiguration('cucumber');
+    const customParameters = extensionConfig.get('cucumber.autocomplete.customParameters', []);
+    customParameters.forEach((p: CustomParameter) => {
       const { parameter, value } = p;
       step = step.split(parameter).join(value);
     });
@@ -400,7 +407,17 @@ export default class StepsHandler {
         const text = this.getTextForStep(step);
         const id = 'step' + getMD5Id(text);
         const count = this.getElementCount(id);
-        return { id, reg, partialReg, text, desc, def, count, gherkin, documentation };
+        return {
+          id,
+          reg,
+          partialReg,
+          text,
+          desc,
+          def,
+          count,
+          gherkin,
+          documentation,
+        };
       });
   }
 
@@ -497,7 +514,7 @@ export default class StepsHandler {
       );
   }
 
-  getStepByText(text: string, gherkin?: GherkinType): Step {
+  getStepByText(text: string, gherkin?: GherkinType): Step | undefined {
     return this.elements.find((s) => (gherkin !== undefined ? s.gherkin === gherkin : true) && s.reg.test(text));
   }
 
