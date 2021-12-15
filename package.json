@@ -45,6 +45,12 @@
     "onLanguage:cucumber"
   ],
   "contributes": {
+    "snippets": [
+      {
+        "language": "cucumber",
+        "path": "snippets.json"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "coc-cucumber configuration",
