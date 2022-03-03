@@ -1,5 +1,9 @@
 # coc-cucumber
 
+# DEPRECATED 
+
+Consider using https://github.com/cucumber/language-server + whatever editor/LSP client you prefer.
+
 WIP Port of [VSCucumberAutoComplete](https://github.com/alexkrechik/VSCucumberAutoComplete) for coc.nvim
 
 Testing with:
